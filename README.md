@@ -199,6 +199,20 @@ cd outlook-cli-skill
 
 ---
 
+## See Also
+
+**[mcp-outlook-lite](https://github.com/w21180239/mcp-outlook-lite)** — Full-featured Outlook MCP server by the same author. 46 tools covering email, calendar, attachments, SharePoint, and rules. Best for MCP-compatible clients (Claude Desktop, Cursor) that need calendar and document parsing capabilities.
+
+| | outlook-cli-skill | mcp-outlook-lite |
+|---|---|---|
+| **Approach** | CLI + skill files | MCP server |
+| **Scope** | Email-focused (26 ops) | Full Outlook (46 tools incl. calendar, SharePoint) |
+| **Agent support** | Any AI agent | MCP-compatible clients |
+| **Runtime** | No server process | Long-running MCP server |
+| **Attachment parsing** | Raw download | Auto-parse PDF/Word/Excel/PPT |
+
+---
+
 ## License
 
 [MIT](LICENSE)
