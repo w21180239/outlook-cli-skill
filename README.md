@@ -28,12 +28,10 @@ curl → Microsoft Graph API → results
 4. Under **Redirect URI**, select **Mobile and desktop applications** from the dropdown, then enter `http://localhost` (no port, no trailing path)
 5. Go to **Authentication** → enable **Allow public client flows** → Save
 6. Go to **API permissions** → **Add a permission** → **Microsoft Graph** → **Delegated permissions**, then add:
-   - `Mail.Read`
    - `Mail.ReadWrite`
    - `Mail.Send`
    - `User.Read`
    - `MailboxSettings.ReadWrite`
-   - `offline_access`
 7. On the **Overview** page, copy:
    - **Application (client) ID**
    - **Directory (tenant) ID**
@@ -47,7 +45,7 @@ No client secret is needed. This uses PKCE (public client) authentication.
 ## Step 2: Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/outlook-cli-skill.git
+git clone https://github.com/w21180239/outlook-cli-skill.git
 cd outlook-cli-skill
 ./install.sh
 ```

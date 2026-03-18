@@ -1,12 +1,10 @@
 // cli/src/auth/config.ts
 
 export const OAUTH_SCOPES = [
-  'Mail.Read',
   'Mail.ReadWrite',
   'Mail.Send',
   'User.Read',
   'MailboxSettings.ReadWrite',
-  'offline_access',
 ].join(' ');
 
 export function authorizeUrl(tenantId: string): string {
