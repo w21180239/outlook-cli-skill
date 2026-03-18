@@ -70,17 +70,16 @@ outlook-auth status
 
 ## Using Outlook Skills (after installation)
 
-**Token pattern** — obtain a fresh token before each request:
+**API wrapper** — use `outlook-auth api` to call Graph API (handles token, base URL, headers automatically):
 
 ```bash
-TOKEN=$(outlook-auth token)
+outlook-auth api GET '/mailFolders/inbox/messages?$top=5'
+outlook-auth api POST /sendMail -d '{"message":{...}}'
+outlook-auth api PATCH '/messages/{id}' -d '{"isRead":true}'
+outlook-auth api DELETE '/messages/{id}'
 ```
 
-**Base URL:**
-
-```
-https://graph.microsoft.com/v1.0/me
-```
+All paths are relative to `https://graph.microsoft.com/v1.0/me`.
 
 **Reference files** (loaded by the router skill via Read tool):
 

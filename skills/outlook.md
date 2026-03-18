@@ -3,16 +3,27 @@ name: outlook
 description: Outlook email operations via Microsoft Graph API. Handles email, folders, attachments, and rules.
 ---
 
-## Prerequisites
+## How to Use
 
-- `outlook-auth` CLI installed and authenticated
-- Get token: `TOKEN=$(outlook-auth token)`
-- All curl calls require: `-H "Authorization: Bearer $TOKEN"`
-- Base URL: `https://graph.microsoft.com/v1.0/me`
+Use `outlook-auth api` to call Microsoft Graph API. It handles token, base URL, and headers automatically:
+
+```bash
+outlook-auth api <METHOD> <path> [-d <json-body>]
+```
+
+Examples:
+```bash
+outlook-auth api GET '/mailFolders/inbox/messages?$top=5'
+outlook-auth api POST /sendMail -d '{"message":{...}}'
+outlook-auth api PATCH '/messages/{id}' -d '{"isRead":true}'
+outlook-auth api DELETE '/messages/{id}'
+```
+
+All paths are relative to `https://graph.microsoft.com/v1.0/me`.
 
 ## Loading Reference Files
 
-The detailed curl templates are in reference files alongside this skill.
+The detailed API templates are in reference files alongside this skill.
 To find them, resolve this skill file's symlink to locate the source directory:
 
 ```bash
@@ -31,19 +42,23 @@ Then use the Read tool to load the appropriate reference file based on user inte
 
 ## Error Handling
 
-Check HTTP status codes in curl responses:
+`outlook-auth api` exits with code 1 on HTTP errors and prints the error body. Common status codes:
 
 | Status | Action |
 |--------|--------|
-| 401 | Token expired. Re-run `TOKEN=$(outlook-auth token)` and retry. |
+| 401 | Token expired — the CLI auto-refreshes, but if it persists, run `outlook-auth login` |
 | 403 | Insufficient permissions. Ask user to check Azure App API permissions. |
 | 404 | Resource not found (bad ID). Inform user. |
-| 429 | Rate limited. Wait the number of seconds in the `Retry-After` header, then retry. |
+| 429 | Rate limited. Wait a few seconds and retry. |
 | 5xx | Transient server error. Retry once after 2 seconds. |
 
 ## Pagination
 
-If a response contains `@odata.nextLink`, there are more results. Follow that URL (with the same Authorization header) to get the next page.
+If a response contains `@odata.nextLink`, there are more results. Use the full nextLink URL:
+
+```bash
+outlook-auth api GET '<full-nextLink-path-after-/me>'
+```
 
 ## High-Stakes Actions (confirm with user first)
 
@@ -58,4 +73,4 @@ If a response contains `@odata.nextLink`, there are more results. Follow that UR
 - Sort: `$orderby=receivedDateTime desc`
 - Filter: `$filter=isRead eq false`
 - Date filter: `$filter=receivedDateTime ge 2024-01-01T00:00:00Z`
-- Always URL-encode filter values in curl
+- URL-encode spaces as `%20` in query parameters

@@ -1,0 +1,46 @@
+{
+  "name": "outlook-cli-skill",
+  "version": "0.1.0",
+  "description": "Turn Outlook email into AI skills — no MCP server required. Lightweight OAuth CLI + skill files for any AI agent.",
+  "type": "module",
+  "bin": {
+    "outlook-auth": "./cli/dist/index.js",
+    "outlook-cli-skill": "./bin/install-skill.js"
+  },
+  "scripts": {
+    "build": "cd cli && npx tsc && chmod +x dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "cli/dist/",
+    "skills/",
+    "bin/",
+    "LICENSE",
+    "README.md",
+    "AGENTS.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "outlook",
+    "email",
+    "microsoft-graph",
+    "ai-skill",
+    "cli",
+    "oauth",
+    "pkce",
+    "claude",
+    "cursor",
+    "codex"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/w21180239/outlook-cli-skill.git"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}
