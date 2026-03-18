@@ -42,11 +42,12 @@ function openBrowser(url: string): void {
       break;
   }
 
-  execFile(cmd, args, (error) => {
+  const child = execFile(cmd, args, (error) => {
     if (error) {
       console.error(`Could not open browser automatically. Please visit the URL above manually.`);
     }
   });
+  child.unref();
 }
 
 async function exchangeCode(
@@ -96,24 +97,27 @@ export async function loginWithPKCE(clientId: string, tenantId: string): Promise
       const returnedState = reqUrl.searchParams.get('state');
 
       if (returnedState !== state) {
-        res.writeHead(400, { 'Content-Type': 'text/html' });
+        res.writeHead(400, { 'Content-Type': 'text/html', 'Connection': 'close' });
         res.end('<h1>Error</h1><p>State mismatch. Please try again.</p>');
         server.close();
+        server.closeAllConnections();
         reject(new Error('State mismatch — possible CSRF attack'));
         return;
       }
 
       if (!code) {
-        res.writeHead(400, { 'Content-Type': 'text/html' });
+        res.writeHead(400, { 'Content-Type': 'text/html', 'Connection': 'close' });
         res.end('<h1>Error</h1><p>No authorization code received.</p>');
         server.close();
+        server.closeAllConnections();
         reject(new Error('No authorization code received'));
         return;
       }
 
-      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Connection': 'close' });
       res.end('<h1>Success!</h1><p>You can close this tab and return to your terminal.</p>');
       server.close();
+      server.closeAllConnections();
 
       try {
         const tokenResponse = await exchangeCode(clientId, tenantId, code, verifier, capturedRedirectUri);
@@ -130,6 +134,9 @@ export async function loginWithPKCE(clientId: string, tenantId: string): Promise
         reject(err);
       }
     });
+
+    // Ensure server shuts down promptly after close() by disabling keep-alive
+    server.keepAliveTimeout = 0;
 
     server.listen(0, () => {
       const addr = server.address() as { port: number };
@@ -155,9 +162,11 @@ export async function loginWithPKCE(clientId: string, tenantId: string): Promise
     server.on('error', reject);
 
     // Timeout after 5 minutes
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       server.close();
+      server.closeAllConnections();
       reject(new Error('Login timed out after 5 minutes'));
     }, 5 * 60 * 1000);
+    timeout.unref();
   });
 }
