@@ -12,41 +12,37 @@ cd "$REPO_DIR/cli" && npm install && npm run build && npm link
 echo "✓ outlook-auth command available"
 echo ""
 
-# 2. Detect AI tools and install skills
-install_skills() {
+# 2. Detect AI tools and install skill (only the router, not reference files)
+install_skill() {
   local target="$1"
   mkdir -p "$target"
-  for f in "$REPO_DIR"/skills/*.md; do
-    local base
-    base="$(basename "$f")"
-    ln -sf "$f" "$target/$base"
-  done
-  echo "✓ Skills installed to $target (symlink)"
+  ln -sf "$REPO_DIR/skills/outlook.md" "$target/outlook.md"
+  echo "✓ Skill installed to $target/outlook.md (symlink)"
 }
 
 INSTALLED=0
 
 if [ -d "$HOME/.shared-ai-skills" ]; then
-  install_skills "$HOME/.shared-ai-skills"
+  install_skill "$HOME/.shared-ai-skills"
   INSTALLED=1
 elif [ -d "$HOME/.claude" ]; then
-  install_skills "$HOME/.claude/skills"
+  install_skill "$HOME/.claude/skills"
   INSTALLED=1
 fi
 
 if [ -d "$HOME/.cursor" ]; then
-  install_skills "$HOME/.cursor/skills"
+  install_skill "$HOME/.cursor/skills"
   INSTALLED=1
 fi
 
 if [ -d "$HOME/.codex" ]; then
-  install_skills "$HOME/.codex/skills"
+  install_skill "$HOME/.codex/skills"
   INSTALLED=1
 fi
 
 if [ "$INSTALLED" -eq 0 ]; then
   echo "⚠ No AI tool config directories detected."
-  echo "  Manually symlink skills/*.md to your AI tool's skills directory."
+  echo "  Manually symlink skills/outlook.md to your AI tool's skills directory."
 fi
 
 echo ""

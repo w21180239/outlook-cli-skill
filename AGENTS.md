@@ -14,34 +14,29 @@ cd <this-repo>/cli && npm install && npm run build && npm link
 
 This makes `outlook-auth` available as a global command.
 
-### Step 2: Detect AI tool and install skills
+### Step 2: Detect AI tool and install the skill
+
+Only install the router skill (`outlook.md`). The reference files it loads stay in the repo.
 
 **Claude Code** — symlink to `~/.shared-ai-skills/` (if it exists) or `~/.claude/skills/`:
 
 ```bash
-for f in <this-repo>/skills/*.md; do ln -sf "$f" ~/.shared-ai-skills/$(basename "$f"); done
+ln -sf <this-repo>/skills/outlook.md ~/.shared-ai-skills/outlook.md
 ```
 
 **Cursor** — symlink to `~/.cursor/skills/`:
 
 ```bash
-for f in <this-repo>/skills/*.md; do ln -sf "$f" ~/.cursor/skills/$(basename "$f"); done
+ln -sf <this-repo>/skills/outlook.md ~/.cursor/skills/outlook.md
 ```
 
 **Codex** — symlink to `~/.codex/skills/`:
 
 ```bash
-for f in <this-repo>/skills/*.md; do ln -sf "$f" ~/.codex/skills/$(basename "$f"); done
+ln -sf <this-repo>/skills/outlook.md ~/.codex/skills/outlook.md
 ```
 
-**Other agents** — read the skill files directly from this repo:
-
-```
-<this-repo>/skills/outlook-email.md
-<this-repo>/skills/outlook-folders.md
-<this-repo>/skills/outlook-attachments.md
-<this-repo>/skills/outlook-rules.md
-```
+**Other agents** — read `<this-repo>/skills/outlook.md` directly. It will guide you to the reference files.
 
 ### Step 3: Check config
 
@@ -87,16 +82,16 @@ TOKEN=$(outlook-auth token)
 https://graph.microsoft.com/v1.0/me
 ```
 
-**Available skill files:**
+**Reference files** (loaded by the router skill via Read tool):
 
 | File | Contents |
 |------|----------|
-| `outlook-email.md` | List, search, get, send, reply, reply all, forward, draft, delete, move, mark read, flag, categorize, archive, batch |
-| `outlook-folders.md` | List, create, rename, stats |
-| `outlook-attachments.md` | List, download, add, scan |
-| `outlook-rules.md` | List, create, delete |
+| `skills/references/outlook-email.md` | List, search, get, send, reply, reply all, forward, draft, delete, move, mark read, flag, categorize, archive, batch |
+| `skills/references/outlook-folders.md` | List, create, rename, stats |
+| `skills/references/outlook-attachments.md` | List, download, add, scan |
+| `skills/references/outlook-rules.md` | List, create, delete |
 
-**How to use:** Read the relevant skill file and follow the curl templates. Each template uses `$TOKEN` for authorization and documents required parameters inline.
+**How to use:** Invoke the `outlook` skill (or read `skills/outlook.md`). It routes to the appropriate reference file based on user intent.
 
 ---
 

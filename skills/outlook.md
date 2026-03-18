@@ -10,16 +10,24 @@ description: Outlook email operations via Microsoft Graph API. Handles email, fo
 - All curl calls require: `-H "Authorization: Bearer $TOKEN"`
 - Base URL: `https://graph.microsoft.com/v1.0/me`
 
-## Routing
+## Loading Reference Files
 
-Based on user intent, use the Read tool to load the corresponding skill file from the same directory where this skill was loaded:
+The detailed curl templates are in reference files alongside this skill.
+To find them, resolve this skill file's symlink to locate the source directory:
 
-| Intent | Skill File |
-|--------|-----------|
-| Read/write/search/send/reply/forward emails | outlook-email.md |
-| Folder operations (list, create, rename) | outlook-folders.md |
-| Attachment operations (list, download, upload) | outlook-attachments.md |
-| Inbox rules (list, create, delete) | outlook-rules.md |
+```bash
+SKILL_SOURCE=$(readlink -f <path-to-this-skill-file>)
+REF_DIR=$(dirname "$SKILL_SOURCE")/references
+```
+
+Then use the Read tool to load the appropriate reference file based on user intent:
+
+| Intent | Reference File |
+|--------|---------------|
+| Read/write/search/send/reply/forward emails | `$REF_DIR/outlook-email.md` |
+| Folder operations (list, create, rename) | `$REF_DIR/outlook-folders.md` |
+| Attachment operations (list, download, upload) | `$REF_DIR/outlook-attachments.md` |
+| Inbox rules (list, create, delete) | `$REF_DIR/outlook-rules.md` |
 
 ## Error Handling
 
