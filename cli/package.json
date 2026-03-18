@@ -1,0 +1,20 @@
+{
+  "name": "outlook-cli-skill",
+  "version": "0.1.0",
+  "description": "Lightweight OAuth CLI for Outlook email skills",
+  "type": "module",
+  "bin": {
+    "outlook-auth": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc && chmod +x dist/index.js",
+    "dev": "tsc --watch"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}
