@@ -2,3 +2,4 @@ node_modules/
 dist/
 .outlook-auth/
 *.js.map
+docs/superpowers/
