@@ -25,21 +25,61 @@ After install, use 'outlook-auth' for authentication management.
   process.exit(0);
 }
 
-// Read skill template and inject absolute reference path
+// Read skill template and inject absolute reference paths
 let skillContent = fs.readFileSync(SKILL_FILE, 'utf-8');
+
+// Replace the reference file resolution section with baked-in absolute paths
 skillContent = skillContent.replace(
-  /## Loading Reference Files[\s\S]*?(\| Intent)/,
-  `## Loading Reference Files
+  /## Reference Files[\s\S]*?URL-encode/,
+  `## Reference Files
 
-The detailed curl templates and API wrapper examples are in reference files.
+Load the appropriate reference file (via Read tool) based on user intent:
 
-**Reference directory:** \`${REF_DIR}\`
+| Intent | Reference File |
+|--------|---------------|
+| Email (read, send, search, reply, forward, draft, delete, move, flag) | \`${REF_DIR}/outlook-email.md\` |
+| Folders (list, create, rename, stats) | \`${REF_DIR}/outlook-folders.md\` |
+| Attachments (list, download, add, scan) | \`${REF_DIR}/outlook-attachments.md\` |
+| Inbox rules (list, create, delete) | \`${REF_DIR}/outlook-rules.md\` |
 
-Use the Read tool to load the appropriate reference file based on user intent:
+## Error Handling
 
-$1`
+\`outlook-auth api\` exits code 1 on errors, printing the error body.
+
+| Status | Action |
+|--------|--------|
+| 401 | Run \`outlook-auth login\` to re-authenticate |
+| 403 | User needs to check Azure App API permissions |
+| 404 | Bad message/folder ID — inform user |
+| 429 | Rate limited — wait a few seconds, retry |
+| 5xx | Transient error — retry once after 2s |
+
+## Pagination
+
+If response contains \`@odata.nextLink\`, follow it for more results:
+
+\`\`\`bash
+outlook-auth api GET '<nextLink-path-after-/me>'
+\`\`\`
+
+## High-Stakes Actions (confirm with user first)
+
+- Sending emails (send, reply, reply all, forward)
+- Deleting emails or rules
+- Creating inbox rules
+
+## Common Query Patterns
+
+| Pattern | Example |
+|---------|---------|
+| Limit | \`$top=10\` |
+| Select fields | \`$select=id,subject,from,receivedDateTime\` |
+| Sort | \`$orderby=receivedDateTime desc\` |
+| Filter | \`$filter=isRead eq false\` |
+| Date filter | \`$filter=receivedDateTime ge 2024-01-01T00:00:00Z\` |
+
+URL-encode`
 );
-skillContent = skillContent.replace(/\`\$REF_DIR\//g, `\`${REF_DIR}/`);
 
 // Detect AI tool directories
 const targets = [];
