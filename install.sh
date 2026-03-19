@@ -14,10 +14,10 @@ echo ""
 
 # 2. Detect AI tools and install skill (only the router, not reference files)
 install_skill() {
-  local target="$1"
+  local target="$1/outlook"
   mkdir -p "$target"
-  ln -sf "$REPO_DIR/skills/outlook.md" "$target/outlook.md"
-  echo "✓ Skill installed to $target/outlook.md (symlink)"
+  ln -sf "$REPO_DIR/skills/outlook.md" "$target/SKILL.md"
+  echo "✓ Skill installed to $target/SKILL.md (symlink)"
 }
 
 INSTALLED=0
@@ -42,7 +42,7 @@ fi
 
 if [ "$INSTALLED" -eq 0 ]; then
   echo "⚠ No AI tool config directories detected."
-  echo "  Manually symlink skills/outlook.md to your AI tool's skills directory."
+  echo "  mkdir -p <skills-dir>/outlook && ln -sf $REPO_DIR/skills/outlook.md <skills-dir>/outlook/SKILL.md"
 fi
 
 echo ""
