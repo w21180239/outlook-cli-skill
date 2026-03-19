@@ -111,8 +111,9 @@ if (targets.length === 0) {
 }
 
 for (const target of targets) {
-  fs.mkdirSync(target, { recursive: true });
-  const dest = path.join(target, 'outlook.md');
+  const skillDir = path.join(target, 'outlook');
+  fs.mkdirSync(skillDir, { recursive: true });
+  const dest = path.join(skillDir, 'SKILL.md');
   fs.writeFileSync(dest, skillContent);
   console.log(`Skill installed to ${dest}`);
 }
