@@ -79,7 +79,25 @@ outlook-auth api PATCH '/messages/{id}' -d '{"isRead":true}'
 outlook-auth api DELETE '/messages/{id}'
 ```
 
+The `-d` flag accepts inline JSON or a file reference (`-d @body.json`). For stdin input, use `--stdin`:
+
+```bash
+outlook-auth api POST '/messages/{id}/attachments' -d @/tmp/attachment.json
+cat payload.json | outlook-auth api POST '/messages/{id}/attachments' --stdin
+```
+
+**Attach files to drafts** — use `outlook-auth attach` (handles base64 encoding automatically):
+
+```bash
+outlook-auth attach {messageId} /path/to/file.pdf
+outlook-auth attach {messageId} /path/to/file.txt --name "Custom Name.txt"
+```
+
+Max file size: 3 MB.
+
 All paths are relative to `https://graph.microsoft.com/v1.0/me`.
+
+> **Caveat:** `$search` cannot be combined with `$orderby`. Search results are returned in relevance order. To get chronological results, use `$filter` with date ranges instead of `$search`.
 
 **Reference files** (loaded by the router skill via Read tool):
 

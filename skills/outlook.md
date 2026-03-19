@@ -9,6 +9,7 @@ Use `outlook-auth api` to call Microsoft Graph API — handles token, base URL, 
 
 ```bash
 outlook-auth api <METHOD> <path> [-d <json-body>]
+outlook-auth attach <message-id> <file-path> [--name <name>]
 ```
 
 All paths are relative to `https://graph.microsoft.com/v1.0/me`.
@@ -64,5 +65,6 @@ outlook-auth api GET '<nextLink-path-after-/me>'
 | Sort | `$orderby=receivedDateTime desc` |
 | Filter | `$filter=isRead eq false` |
 | Date filter | `$filter=receivedDateTime ge 2024-01-01T00:00:00Z` |
+| Search (no sort) | `$search="keyword"` (cannot combine with `$orderby`) |
 
 URL-encode spaces as `%20` in query parameters.

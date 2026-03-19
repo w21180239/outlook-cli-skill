@@ -1,48 +1,22 @@
 // cli/src/commands/api.ts
 // Wrapper for Microsoft Graph API calls — handles token, base URL, headers automatically.
 
-import { loadConfig, loadTokens, saveTokens, isTokenExpired } from '../auth/tokenStore.js';
-import { tokenUrl } from '../auth/config.js';
-import type { StoredTokens } from '../auth/tokenStore.js';
+import fs from 'node:fs';
+import { loadConfig, loadTokens } from '../auth/tokenStore.js';
+import { getValidToken, BASE_URL } from '../auth/graphClient.js';
 
-const BASE_URL = 'https://graph.microsoft.com/v1.0/me';
-
-async function getValidToken(clientId: string, tenantId: string, tokens: StoredTokens): Promise<string> {
-  if (!isTokenExpired(tokens)) {
-    return tokens.access_token;
-  }
-
-  // Refresh
-  const params = new URLSearchParams({
-    client_id: clientId,
-    grant_type: 'refresh_token',
-    refresh_token: tokens.refresh_token,
-  });
-
-  const response = await fetch(tokenUrl(tenantId), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params.toString(),
-  });
-
-  const body = (await response.json()) as Record<string, unknown>;
-
-  if (!response.ok) {
-    if (body.error === 'invalid_grant') {
-      console.error('Error: Session expired. Run: outlook-auth login');
-      process.exit(1);
+function readStdin(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    // If stdin is a TTY (no pipe), return empty immediately
+    if (process.stdin.isTTY) {
+      resolve('');
+      return;
     }
-    throw new Error(`Token refresh failed: ${body.error}`);
-  }
-
-  const refreshed: StoredTokens = {
-    access_token: body.access_token as string,
-    refresh_token: (body.refresh_token as string) || tokens.refresh_token,
-    expires_at: Date.now() + (body.expires_in as number) * 1000,
-    scope: (body.scope as string) || '',
-  };
-  saveTokens(refreshed);
-  return refreshed.access_token;
+    const chunks: Buffer[] = [];
+    process.stdin.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+    process.stdin.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+    process.stdin.on('error', reject);
+  });
 }
 
 export async function apiCommand(args: string[]): Promise<void> {
@@ -58,26 +32,48 @@ export async function apiCommand(args: string[]): Promise<void> {
     process.exit(1);
   }
 
-  // Parse args: METHOD PATH [-d BODY]
+  // Parse args: METHOD PATH [-d BODY | -d @file | --stdin]
   const method = (args[0] || '').toUpperCase();
   let apiPath = args[1] || '';
 
   if (!method || !apiPath) {
-    console.error('Usage: outlook-auth api <METHOD> <path> [-d <json-body>]');
+    console.error('Usage: outlook-auth api <METHOD> <path> [-d <json-body> | -d @<file> | --stdin]');
     console.error('');
     console.error('Examples:');
     console.error('  outlook-auth api GET /mailFolders/inbox/messages?\\$top=5');
     console.error('  outlook-auth api POST /sendMail -d \'{"message":{...}}\'');
+    console.error('  outlook-auth api POST /sendMail -d @payload.json');
+    console.error('  echo \'{"message":{...}}\' | outlook-auth api POST /sendMail --stdin');
     console.error('  outlook-auth api PATCH /messages/{id} -d \'{"isRead":true}\'');
     console.error('  outlook-auth api DELETE /messages/{id}');
     process.exit(1);
   }
 
-  // Find -d flag for request body
+  // Determine request body
   let body: string | undefined;
-  const dashD = args.indexOf('-d');
-  if (dashD !== -1 && args[dashD + 1]) {
-    body = args[dashD + 1];
+  const useStdin = args.includes('--stdin');
+
+  if (useStdin) {
+    const stdinData = await readStdin();
+    if (stdinData.trim()) {
+      body = stdinData;
+    }
+  } else {
+    const dashD = args.indexOf('-d');
+    if (dashD !== -1 && args[dashD + 1]) {
+      const dValue = args[dashD + 1];
+      if (dValue.startsWith('@')) {
+        const filePath = dValue.slice(1);
+        try {
+          body = fs.readFileSync(filePath, 'utf-8');
+        } catch (err) {
+          console.error(`Error: Cannot read file "${filePath}": ${err instanceof Error ? err.message : err}`);
+          process.exit(1);
+        }
+      } else {
+        body = dValue;
+      }
+    }
   }
 
   // Ensure path starts with /
