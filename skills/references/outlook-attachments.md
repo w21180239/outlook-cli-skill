@@ -30,15 +30,26 @@ outlook-auth api GET '/messages/{messageId}/attachments/{attachmentId}' | jq -r 
 
 ## 3. Add Attachment (to draft)
 
+**Preferred — use `attach` command** (handles base64 automatically):
+
 ```bash
-outlook-auth api POST '/messages/{messageId}/attachments' -d '{
-  "@odata.type": "#microsoft.graph.fileAttachment",
-  "name": "document.pdf",
-  "contentBytes": "<base64-encoded-content>"
-}'
+outlook-auth attach {messageId} /path/to/document.pdf
+outlook-auth attach {messageId} /path/to/file.txt --name "Custom Name.txt"
 ```
 
-To encode a file: `base64 -i file.pdf`
+Max file size: 3 MB. Returns created attachment JSON.
+
+**Alternative — via `api` with file input:**
+
+```bash
+# Prepare JSON payload in a file, then:
+outlook-auth api POST '/messages/{messageId}/attachments' -d @/tmp/attachment.json
+
+# Or via stdin:
+cat attachment.json | outlook-auth api POST '/messages/{messageId}/attachments' --stdin
+```
+
+> **Warning:** Do NOT pass large base64 content inline with `-d '{...}'` — it will exceed shell argument limits. Use `-d @file`, `--stdin`, or the `attach` command instead.
 
 ---
 
@@ -53,3 +64,11 @@ outlook-auth api GET '/messages?$filter=hasAttachments%20eq%20true&$top=10&$sele
 # Step 2: For each message ID, list its attachments
 outlook-auth api GET '/messages/{id}/attachments?$select=name,size,contentType'
 ```
+
+---
+
+## Caveats
+
+- `attach` command supports files up to 3 MB (Graph API simple upload limit).
+- Base64 encoding adds ~33% size overhead, so a 2.25 MB file produces ~3 MB of JSON payload.
+- For larger files, the Graph API upload session endpoint (`/createUploadSession`) is needed (not yet supported by the CLI).

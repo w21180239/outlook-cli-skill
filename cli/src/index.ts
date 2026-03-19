@@ -7,6 +7,7 @@ import { statusCommand } from './commands/status.js';
 import { logoutCommand } from './commands/logout.js';
 import { configCommand } from './commands/config.js';
 import { apiCommand } from './commands/api.js';
+import { attachCommand } from './commands/attach.js';
 
 const USAGE = `
 outlook-auth — OAuth CLI for Outlook email skills
@@ -19,10 +20,15 @@ Commands:
   config set <key> <value> [...]         Set clientId / tenantId
   config show                            Show current config
   api <METHOD> <path> [-d <body>]        Call Microsoft Graph API
+                       [-d @<file>]        … body from file
+                       [--stdin]           … body from stdin
+  attach <message-id> <file> [--name N]  Attach file to a draft message
 
 API examples:
   outlook-auth api GET /mailFolders/inbox/messages?\\$top=5
   outlook-auth api POST /sendMail -d '{"message":{...}}'
+  outlook-auth api POST /sendMail -d @payload.json
+  echo '{"message":{...}}' | outlook-auth api POST /sendMail --stdin
   outlook-auth api PATCH /messages/{id} -d '{"isRead":true}'
   outlook-auth api DELETE /messages/{id}
 
@@ -53,6 +59,9 @@ async function main(): Promise<void> {
       break;
     case 'api':
       await apiCommand(args.slice(1));
+      break;
+    case 'attach':
+      await attachCommand(args.slice(1));
       break;
     case '--help':
     case '-h':

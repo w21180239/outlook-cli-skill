@@ -24,6 +24,8 @@ outlook-auth api GET '/messages?$search="keyword"&$top=10&$select=id,subject,fro
 - Searches across all folders
 - Combine: `$search="from:alice subject:budget"`
 
+> **Caveat:** `$search` cannot be combined with `$orderby`. Results are returned in relevance order. To get chronological results, use `$filter` with date ranges instead of `$search`.
+
 ---
 
 ## 3. Get Email Detail
@@ -159,3 +161,31 @@ for id in ID1 ID2 ID3; do
   outlook-auth api PATCH "/messages/$id" -d '{"isRead": true}'
 done
 ```
+
+---
+
+## 16. Reply Draft Workflow
+
+Create a reply with custom body and attachments:
+
+```bash
+# Step 1: Create reply draft
+outlook-auth api POST '/messages/{original-id}/createReply' -d '{}'
+
+# Step 2: Update draft body (use -d @file for large HTML content)
+outlook-auth api PATCH '/messages/{draft-id}' -d '{"body":{"contentType":"HTML","content":"<p>Reply here</p>"}}'
+# For large bodies:
+outlook-auth api PATCH '/messages/{draft-id}' -d @body.json
+
+# Step 3: Add attachments
+outlook-auth attach {draft-id} /path/to/file.pdf
+outlook-auth attach {draft-id} /path/to/image.png --name "Screenshot.png"
+
+# Step 4: Send the draft
+outlook-auth api POST '/messages/{draft-id}/send'
+```
+
+- `createReply` pre-populates recipients and quoted original.
+- Use `createReplyAll` instead to reply all.
+- PATCH replaces the entire body — include quoted original if needed.
+- The draft stays in Drafts folder until sent.
