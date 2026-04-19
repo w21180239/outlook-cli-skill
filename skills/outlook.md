@@ -68,3 +68,12 @@ outlook-auth api GET '<nextLink-path-after-/me>'
 | Search (no sort) | `$search="keyword"` (cannot combine with `$orderby`) |
 
 URL-encode spaces as `%20` in query parameters.
+
+## Timezone
+
+Graph API returns all timestamps in UTC. **Always convert to NZDT (UTC+13) for display.** Add 13 hours to `receivedDateTime` etc. before presenting to user.
+
+## Reading Emails — Behavioral Rules
+
+- **Always check attachments:** After reading an email, check `hasAttachments` field. If `true`, list attachments and read relevant ones (PDFs, docs). Key information (addresses, instructions, deadlines) is often in attachments, not the body.
+- For action-oriented emails (government letters, contracts, booking confirmations, delivery notices): always read attachments before reporting conclusions.
