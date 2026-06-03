@@ -3,6 +3,12 @@ name: outlook
 description: Use when the user wants to read, send, search, or manage Outlook emails, folders, attachments, or inbox rules via Microsoft Graph API.
 ---
 
+# Outlook
+
+## Overview
+
+Microsoft Graph API-based Outlook integration for reading, sending, searching, and managing mail, folders, attachments, and inbox rules. Operates on the authenticated user's mailbox via the `outlook-auth` CLI wrapper.
+
 ## Quick Start
 
 Use `outlook-auth api` to call Microsoft Graph API — handles token, base URL, and headers automatically:
