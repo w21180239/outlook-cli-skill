@@ -20,6 +20,12 @@ outlook-auth attach <message-id> <file-path> [--name <name>]
 
 All paths are relative to `https://graph.microsoft.com/v1.0/me`.
 
+## When to Use
+
+- Reading, sending, searching, replying to, or forwarding emails in Outlook
+- Managing folders, inbox rules, or email attachments via Microsoft Graph API
+- Downloading attachments or flagging/moving messages programmatically
+
 ## When NOT to Use
 
 - Calendar, contacts, or OneDrive operations (not supported)
