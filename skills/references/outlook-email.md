@@ -189,3 +189,29 @@ outlook-auth api POST '/messages/{draft-id}/send'
 - Use `createReplyAll` instead to reply all.
 - PATCH replaces the entire body — include quoted original if needed.
 - The draft stays in Drafts folder until sent.
+
+---
+
+## 17. Scheduled Send (deferred delivery)
+
+Set `PidTagDeferredSendTime` (`SystemTime 0x3FEF`, UTC) on the draft, then `/send`. The server holds the message and sends it at that time. Verified on an outlook.com account (2026-09-25): sent at the exact deferred second, in the inbox ~20s later.
+
+```bash
+# New message
+outlook-auth api POST '/messages' -d '{"subject":"...","body":{"contentType":"HTML","content":"..."},"toRecipients":[{"emailAddress":{"address":"a@b.com"}}],"singleValueExtendedProperties":[{"id":"SystemTime 0x3FEF","value":"2026-09-28T01:00:00Z"}]}'
+
+# Existing draft (e.g. from createReply)
+outlook-auth api PATCH '/messages/{draft-id}' -d '{"singleValueExtendedProperties":[{"id":"SystemTime 0x3FEF","value":"2026-09-28T01:00:00Z"}]}'
+
+# Queue it
+outlook-auth api POST '/messages/{draft-id}/send'
+
+# Verify: still isDraft=true, in Drafts, property set
+outlook-auth api GET "/messages/{draft-id}?\$select=isDraft,parentFolderId&\$expand=singleValueExtendedProperties(\$filter=id%20eq%20'SystemTime%200x3FEF')"
+```
+
+- Value is UTC `...Z`. Derive it from the **recipient's** working hours with `zoneinfo` (e.g. `Australia/Perth`, `Pacific/Auckland`); never hand-add offsets, NZ DST flips on the last Sunday of September and the first Sunday of April.
+- After `/send` the message stays in **Drafts** (`isDraft: true`) until due, then moves to Sent Items.
+- A time in the past sends immediately. Check the value before `/send`.
+- Cancel or reschedule before the due time: `DELETE /messages/{id}` or PATCH a new value. Untested; verify with the GET above.
+- Scheduling is sending: confirm the final text with the user first.

@@ -37,10 +37,10 @@ Load the appropriate reference file (via Read tool) based on user intent:
 
 | Intent | Reference File |
 |--------|---------------|
-| Email (read, send, search, reply, forward, draft, delete, move, flag) | `/Users/wliu1/tools/outlook-cli-skill/skills/references/outlook-email.md` |
-| Folders (list, create, rename, stats) | `/Users/wliu1/tools/outlook-cli-skill/skills/references/outlook-folders.md` |
-| Attachments (list, download, add, scan) | `/Users/wliu1/tools/outlook-cli-skill/skills/references/outlook-attachments.md` |
-| Inbox rules (list, create, delete) | `/Users/wliu1/tools/outlook-cli-skill/skills/references/outlook-rules.md` |
+| Email (read, send, scheduled send, search, reply, forward, draft, delete, move, flag) | `references/outlook-email.md` |
+| Folders (list, create, rename, stats) | `references/outlook-folders.md` |
+| Attachments (list, download, add, scan) | `references/outlook-attachments.md` |
+| Inbox rules (list, create, delete) | `references/outlook-rules.md` |
 
 ## Error Handling
 
@@ -65,6 +65,7 @@ outlook-auth api GET '<nextLink-path-after-/me>'
 ## High-Stakes Actions (confirm with user first)
 
 - Sending emails (send, reply, reply all, forward)
+- Scheduling a send (goes out unattended; see `references/outlook-email.md` §17)
 - Deleting emails or rules
 - Creating inbox rules
 
@@ -83,7 +84,7 @@ URL-encode spaces as `%20` in query parameters.
 
 ## Timezone
 
-Graph API returns all timestamps in UTC. **Always convert to NZDT (UTC+13) for display.** Add 13 hours to `receivedDateTime` etc. before presenting to user.
+Graph API returns all timestamps in UTC. **Convert to NZ local time for display** with `zoneinfo` (`Pacific/Auckland`): NZDT UTC+13 from the last Sunday of September, NZST UTC+12 from the first Sunday of April. Never hard-code the offset.
 
 ## Reading Emails — Behavioral Rules
 
