@@ -213,5 +213,6 @@ outlook-auth api GET "/messages/{draft-id}?\$select=isDraft,parentFolderId&\$exp
 - Value is UTC `...Z`. Derive it from the **recipient's** working hours with `zoneinfo` (e.g. `Australia/Perth`, `Pacific/Auckland`); never hand-add offsets, NZ DST flips on the last Sunday of September and the first Sunday of April.
 - After `/send` the message stays in **Drafts** (`isDraft: true`) until due, then moves to Sent Items.
 - A time in the past sends immediately. Check the value before `/send`.
-- Cancel or reschedule before the due time: `DELETE /messages/{id}` or PATCH a new value. Untested; verify with the GET above.
+- **Cancel: `DELETE /messages/{id}`** before the due time (verified: returns 204, the item is gone from Drafts and GET returns 404). `POST /messages/{id}/move` to Deleted Items fails on a queued message with `ErrorMoveCopyFailed` (HTTP 500), so use DELETE.
+- Reschedule by PATCHing a new value: untested on a queued message; safer to DELETE and recreate.
 - Scheduling is sending: confirm the final text with the user first.
