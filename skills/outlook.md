@@ -5,6 +5,8 @@ description: Use when the user wants to read, send, search, or manage Outlook em
 
 # Outlook
 
+> **Personal mailbox only.** This skill and `outlook-auth login` reach Wei's **personal** mailbox. Never use them for work (IDEXX) email — that goes through the claude.ai Microsoft 365 connector (`mcp__claude_ai_Microsoft_365__*`: `outlook_email_search`, `outlook_calendar_search`, `sharepoint_search`, `teams_*`). `outlook-auth login` needs a browser and hangs inside a subagent. In subagent prompts about work email, name the M365 connector explicitly and forbid this skill. (2026-09-25: a subagent tried `outlook-auth` for an IDEXX policy search.)
+
 ## Overview
 
 Microsoft Graph API-based Outlook integration for reading, sending, searching, and managing mail, folders, attachments, and inbox rules. Operates on the authenticated user's mailbox via the `outlook-auth` CLI wrapper.
