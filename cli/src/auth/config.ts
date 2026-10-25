@@ -5,6 +5,7 @@ export const OAUTH_SCOPES = [
   'Mail.Send',
   'User.Read',
   'MailboxSettings.ReadWrite',
+  'offline_access', // without it Microsoft returns no refresh token and the session dies after 1h
 ].join(' ');
 
 export function authorizeUrl(tenantId: string): string {
