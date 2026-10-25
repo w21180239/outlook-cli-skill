@@ -5,7 +5,7 @@ description: Use when the user wants to read, send, search, or manage Outlook em
 
 # Outlook
 
-> **Personal mailbox only.** This skill and `outlook-auth login` reach the owner's **personal** mailbox. Never use them for work (AcmeCorp) email — that goes through the claude.ai Microsoft 365 connector (`mcp__claude_ai_Microsoft_365__*`: `outlook_email_search`, `outlook_calendar_search`, `sharepoint_search`, `teams_*`). `outlook-auth login` needs a browser and hangs inside a subagent. In subagent prompts about work email, name the M365 connector explicitly and forbid this skill. (2026-09-25: a subagent tried `outlook-auth` for an AcmeCorp policy search.)
+> **Personal mailbox only.** This skill and `outlook-auth login` reach the user's **personal** mailbox. Never use them for work email; use the work tenant's own connector instead. `outlook-auth login` needs a browser and hangs inside a subagent, so in subagent prompts about work email name the work connector explicitly and forbid this skill. If `references/environment.local.md` exists, read it for this machine's routing.
 
 ## Overview
 

@@ -4,3 +4,4 @@ cli/dist/
 *.js.map
 docs/superpowers/
 package-lock.json
+*.local.md
