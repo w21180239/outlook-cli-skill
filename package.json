@@ -8,7 +8,7 @@
     "outlook-cli-skill": "./bin/install-skill.js"
   },
   "scripts": {
-    "build": "cd cli && npx tsc && chmod +x dist/index.js",
+    "build": "cd cli && npx tsc",
     "prepublishOnly": "npm run build"
   },
   "files": [
@@ -44,3 +44,4 @@
     "@types/node": "^22.0.0"
   }
 }
+

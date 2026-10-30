@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILLS_DIR = path.join(__dirname, '..', 'skills');
-const SKILL_FILE = path.join(SKILLS_DIR, 'outlook.md');
+const SKILL_FILE = path.join(SKILLS_DIR, 'SKILL.md');
 const REF_DIR = path.join(SKILLS_DIR, 'references');
 
 const args = process.argv.slice(2);
