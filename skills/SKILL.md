@@ -92,3 +92,22 @@ Graph API returns all timestamps in UTC. **Convert to NZ local time for display*
 
 - **Always check attachments:** After reading an email, check `hasAttachments` field. If `true`, list attachments and read relevant ones (PDFs, docs). Key information (addresses, instructions, deadlines) is often in attachments, not the body.
 - For action-oriented emails (government letters, contracts, booking confirmations, delivery notices): always read attachments before reporting conclusions.
+
+## Cross-machine config
+
+Your client ID and tenant ID live in the private repo \personal-credentials\.
+On a new machine:
+
+\\\ash
+gh repo clone w21180239/personal-credentials ~/tools/personal-credentials
+outlook-auth setup symlink ~/tools/personal-credentials/outlook/config.json
+outlook-auth login
+\\\
+
+Or skip the symlink and use environment variables instead:
+
+\\\ash
+export AZURE_CLIENT_ID=967ca7bb-f8f0-40fb-a405-4e1c2666d00d
+export AZURE_TENANT_ID=consumers
+\\\
+Environment variables override any file config.
