@@ -8,6 +8,7 @@ import { logoutCommand } from './commands/logout.js';
 import { configCommand } from './commands/config.js';
 import { apiCommand } from './commands/api.js';
 import { attachCommand } from './commands/attach.js';
+import { setupCommand } from './commands/setup.js';
 
 const USAGE = `
 outlook-auth — OAuth CLI for Outlook email skills
@@ -62,6 +63,9 @@ async function main(): Promise<void> {
       break;
     case 'attach':
       await attachCommand(args.slice(1));
+      break;
+    case 'setup':
+      await setupCommand(args.slice(1));
       break;
     case '--help':
     case '-h':
