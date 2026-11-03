@@ -5,3 +5,4 @@ cli/dist/
 docs/superpowers/
 package-lock.json
 *.local.md
+.DS_Store
