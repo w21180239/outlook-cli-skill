@@ -52,7 +52,7 @@ Load the appropriate reference file (via Read tool) based on user intent:
 |--------|--------|
 | 401 | Run `outlook-auth login` to re-authenticate |
 | 403 | User needs to check Azure App API permissions |
-| 404 | Bad message/folder ID — inform user |
+| 404 | Bad message/folder ID — inform user. On Git Bash, a 404 on every write while GETs work means path rewriting; the CLI now undoes it, and `MSYS_NO_PATHCONV=1` is the manual fallback |
 | 429 | Rate limited — wait a few seconds, retry |
 | 5xx | Transient error — retry once after 2s |
 
