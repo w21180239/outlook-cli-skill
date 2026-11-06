@@ -2,7 +2,7 @@
 // Shared Graph API helpers — token refresh + base URL.
 
 import { saveTokens, isTokenExpired } from './tokenStore.js';
-import { tokenUrl } from './config.js';
+import { tokenUrl, OAUTH_SCOPES } from './config.js';
 import type { StoredTokens } from './tokenStore.js';
 
 export const BASE_URL = 'https://graph.microsoft.com/v1.0/me';
@@ -17,6 +17,7 @@ export async function getValidToken(clientId: string, tenantId: string, tokens: 
     client_id: clientId,
     grant_type: 'refresh_token',
     refresh_token: tokens.refresh_token,
+    scope: OAUTH_SCOPES,
   });
 
   const response = await fetch(tokenUrl(tenantId), {
