@@ -63,6 +63,7 @@ async function exchangeCode(
     code,
     redirect_uri: redirectUri,
     code_verifier: verifier,
+    scope: OAUTH_SCOPES,
   });
 
   const response = await fetch(tokenUrl(tenantId), {

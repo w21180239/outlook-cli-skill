@@ -2,8 +2,34 @@
 // Wrapper for Microsoft Graph API calls — handles token, base URL, headers automatically.
 
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { loadConfig, loadTokens } from '../auth/tokenStore.js';
 import { getValidToken, BASE_URL } from '../auth/graphClient.js';
+
+// Git Bash rewrites a leading-slash arg like /messages/x into <msys-root>/messages/x
+// (e.g. D:/Git/messages/x) before node sees it; args containing '?' are left alone,
+// which is why GETs with query strings worked while plain POST paths 404'd.
+export function undoMsysPathConversion(apiPath: string, msysRoot?: string): string {
+  if (!/^[A-Za-z]:[\\/]/.test(apiPath)) return apiPath;
+  let root = msysRoot;
+  if (root === undefined && process.env.MSYSTEM) {
+    try {
+      root = execFileSync('cygpath', ['-m', '/'], { encoding: 'utf-8' }).trim();
+    } catch {
+      root = undefined;
+    }
+  }
+  const normalised = apiPath.replace(/\\/g, '/');
+  if (root) {
+    const r = root.replace(/\\/g, '/').replace(/\/+$/, '');
+    if (normalised.toLowerCase().startsWith(r.toLowerCase() + '/')) {
+      return normalised.slice(r.length);
+    }
+  }
+  console.error(`Error: path "${apiPath}" looks like a filesystem path, not a Graph path.`);
+  console.error('Git Bash rewrites leading-slash args; rerun with MSYS_NO_PATHCONV=1.');
+  process.exit(1);
+}
 
 function readStdin(): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -75,6 +101,8 @@ export async function apiCommand(args: string[]): Promise<void> {
       }
     }
   }
+
+  apiPath = undoMsysPathConversion(apiPath);
 
   // Ensure path starts with /
   if (!apiPath.startsWith('/')) {

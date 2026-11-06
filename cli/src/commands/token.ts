@@ -1,5 +1,5 @@
 import { loadConfig, loadTokens, saveTokens, isTokenExpired } from '../auth/tokenStore.js';
-import { tokenUrl } from '../auth/config.js';
+import { tokenUrl, OAUTH_SCOPES } from '../auth/config.js';
 import type { StoredTokens } from '../auth/tokenStore.js';
 
 async function refreshToken(clientId: string, tenantId: string, refreshToken: string): Promise<StoredTokens> {
@@ -7,6 +7,7 @@ async function refreshToken(clientId: string, tenantId: string, refreshToken: st
     client_id: clientId,
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
+    scope: OAUTH_SCOPES,
   });
 
   const response = await fetch(tokenUrl(tenantId), {
